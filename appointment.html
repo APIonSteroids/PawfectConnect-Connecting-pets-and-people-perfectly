@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - Healthofy</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* appointment.css */
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f4;
+}
+
+.appointment {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.appointment h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #4CAF50;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #45a049;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.appointment-image {
+    width: 100%;
+    height: 200px;
+    background-image: url('https://source.unsplash.com/1600x900/?veterinary,clinic');
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px 10px 0 0;
+    margin-bottom: 2rem;
+}
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="cursor"></div>
+    <nav>
+                <div class="logo"><image src='https://www.shutterstock.com/image-vector/dog-cat-pet-animal-logo-600nw-2447119691.jpg'></div> 
+                <div class="text">
+                    <a href="index.html">Healthofy</a>
+                </div>
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="appointment.html">Book appointment</a></li>
+                    <li><a href="breed.html">Breed</a></li>
+                    <li><a href="product.html">Products</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                </ul>
+                <div><a href="Logout.php">Logout</a></div>
+                <div><a href="cart.html">Bag</a></div>                     
+            </nav>
+
+    <main>
+        <section class="appointment">
+            <h1>Book an Appointment</h1>
+            <form id="appointment-form" method="POST" action="BookAppointmentServlet">
+                <div class="form-group">
+                    <label for="pet-name">Pet's Name</label>
+                    <input type="text" id="pet-name" name="pet-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="pet-type">Pet Type</label>
+                    <select id="pet-type" name="pet-type" required>
+                        <option value="">Select pet type</option>
+                        <option value="dog">Dog</option>
+                        <option value="cat">Cat</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="owner-name">Owner's Name</label>
+                    <input type="text" id="owner-name" name="owner-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="date">Preferred Date</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="time">Preferred Time</label>
+                    <input type="time" id="time" name="time" required>
+                </div>
+                <div class="form-group">
+                    <label for="reason">Reason for Visit</label>
+                    <textarea id="reason" name="reason" required></textarea>
+                </div>
+                <button type="submit" class="btn">Book Appointment</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Healthofy. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

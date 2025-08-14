@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - Healthofy</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .cart-overlay {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100%;
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+.cart-overlay.active {
+    right: 0;
+}
+
+.cart-content {
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-content h2 {
+    margin-bottom: 20px;
+}
+
+#cart-items {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.cart-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    margin-right: 15px;
+}
+
+.item-details {
+    flex-grow: 1;
+}
+
+.item-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.item-price {
+    color: #666;
+}
+
+.item-quantity {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.quantity-btn {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.item-quantity input {
+    width: 40px;
+    text-align: center;
+    margin: 0 5px;
+}
+
+.remove-item {
+    color: #ff0000;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.cart-summary {
+    margin-top: 20px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.total {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.cart-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #45a049;
+}
+
+#cart-icon-container {
+    position: relative;
+}
+
+#cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ff0000;
+    color: white;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 50%;
+}
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="logo"><img src='https://www.shutterstock.com/image-vector/dog-cat-pet-animal-logo-600nw-2447119691.jpg' alt="Healthofy Logo"></div> 
+        <div class="text">
+            <a href="index.html">Healthofy</a>
+        </div>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+        </ul>
+        <div><a href="singin.html">Sign in</a></div>
+        <div id="cart-icon-container">
+            <a href="cart.html" id="cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cart-count">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="cart-container">
+            <h1>Your Shopping Cart</h1>
+            <div id="cart-items">
+                <!-- Cart items will be dynamically inserted here -->
+            </div>
+            <div class="cart-summary">
+                <div class="summary-item">
+                    <span>Subtotal:</span>
+                    <span id="cart-subtotal">Rs. 0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Tax (5%):</span>
+                    <span id="cart-tax">Rs. 0</span>
+                </div>
+                <div class="summary-item total">
+                    <span>Total:</span>
+                    <span id="cart-total">Rs. 0</span>
+                </div>
+            </div>
+            <div class="cart-actions">
+                <a href="product.html" class="btn">Continue Shopping</a>
+                <button id="checkout-btn" class="btn">Proceed to Checkout</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Healthofy. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+const cartOverlay = document.getElementById('cart-overlay');
+const cartItems = document.getElementById('cart-items');
+const cartSubtotal = document.getElementById('cart-subtotal');
+const cartTax = document.getElementById('cart-tax');
+const cartTotal = document.getElementById('cart-total');
+const cartCount = document.getElementById('cart-count');
+const cartIcon = document.getElementById('cart-icon');
+const viewCartBtn = document.getElementById('view-cart-btn');
+const checkoutBtn = document.getElementById('checkout-btn');
+
+function updateCartDisplay() {
+    cartItems.innerHTML = '';
+    let subtotal = 0;
+
+    cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+
+        cartItems.innerHTML += `
+            <div class="cart-item">
+                <img src="${item.image}" alt="${item.name}">
+                <div class="item-details">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-price">Rs. ${item.price}</div>
+                    <div class="item-quantity">
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                        <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${item.id}, this.value)">
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                    </div>
+                </div>
+                <span class="remove-item" onclick="removeItem(${item.id})">×</span>
+            </div>
+        `;
+    });
+
+    const tax = subtotal * 0.05;
+    const total = subtotal + tax;
+
+    cartSubtotal.textContent = `Rs. ${subtotal.toFixed(2)}`;
+    cartTax.textContent = `Rs. ${tax.toFixed(2)}`;
+    cartTotal.textContent = `Rs. ${total.toFixed(2)}`;
+    cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function addToCart(id, name, price, image) {
+    const existingItem = cart.find(item => item.id === id);
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({ id, name, price, image, quantity: 1 });
+    }
+    updateCartDisplay();
+    cartOverlay.classList.add('active');
+}
+
+function updateQuantity(id, newQuantity) {
+    const index = cart.findIndex(item => item.id === id);
+    if (index !== -1) {
+        newQuantity = parseInt(newQuantity);
+        if (newQuantity > 0) {
+            cart[index].quantity = newQuantity;
+        } else {
+            cart.splice(index, 1);
+        }
+        updateCartDisplay();
+    }
+}
+
+function removeItem(id) {
+    cart = cart.filter(item => item.id !== id);
+    updateCartDisplay();
+}
+
+cartIcon.addEventListener('click', (e) => {
+    e.preventDefault();
+    cartOverlay.classList.toggle('active');
+});
+
+viewCartBtn.addEventListener('click', () => {
+    window.location.href = 'cart.html';
+});
+
+checkoutBtn.addEventListener('click', () => {
+    alert('Thank you for your purchase! This is where you would integrate a payment gateway.');
+});
+
+document.addEventListener('click', (e) => {
+    if (!cartOverlay.contains(e.target) && e.target !== cartIcon) {
+        cartOverlay.classList.remove('active');
+    }
+});
+
+// Initialize the cart display
+updateCartDisplay();
+    </script>
+</body>
+</html>

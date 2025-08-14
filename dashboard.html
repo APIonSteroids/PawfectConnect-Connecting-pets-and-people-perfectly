@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Clinic Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+ /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #F9F9F9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Main Content */
+        main {
+            padding: 40px;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Form Styling */
+        form {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            display: grid;
+            gap: 15px;
+        }
+
+        form label {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        form input, form select, form textarea {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            transition: border-color 0.3s;
+        }
+
+        form input:focus, form select:focus, form textarea:focus {
+            border-color: #ff6a00;
+            outline: none;
+        }
+
+        form button {
+            background-color: #ff6a00;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        form button:hover {
+            background-color: #f45c43;
+        }
+
+        /* Notification Style */
+        #notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            animation: fadeIn 0.5s ease-in-out, fadeOut 3s 5s ease-in-out;
+        }
+
+        #notification.error {
+            background-color: #f44336; /* Red for error */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* Pet Data Overview */
+        .pet-overview {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+        }
+
+        .pet-overview canvas {
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+        }
+        
+
+    </style>
+</head>
+<body>
+    <div class="cursor"></div>           
+            <nav>
+                <div class="logo"><image src='https://www.shutterstock.com/image-vector/dog-cat-pet-animal-logo-600nw-2447119691.jpg'></div> 
+                <div class="text">
+                    <a href="index.html">Healthofy</a>
+                </div>
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="appointment.html">Book appointment</a></li>
+                    <li><a href="breed.html">Breed</a></li>
+                    <li><a href="product.html">Products</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                </ul>
+                <div><a href="Logout.php">Logout</a></div>
+                <div><a href="cart.html">Bag</a></div>                    
+            </nav>
+    
+
+    <main>
+    <section>
+        <h2>Add Pet Information</h2>
+        <form id="pet-form" action="Pet.php" method="post">
+            <label for="petName">Pet Name:</label>
+            <input type="text" id="petName" name="petName" required>
+
+            <label for="ownerName">Owner Name:</label>
+            <input type="text" id="ownerName" name="ownerName" required>
+
+            <label for="petType">Pet Type:</label>
+            <select id="petType" name="petType" required>
+                <option value="dog">Dog</option>
+                <option value="cat">Cat</option>
+            </select>
+
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" required>
+
+            <label for="healthIssue">Health Issues:</label>
+            <textarea id="healthIssue" name="healthIssue" rows="4"></textarea>
+
+            <button type="submit">Add Pet</button>
+        </form>
+    </section>
+
+    <section>
+        <h2>Pet Data Overview</h2>
+        <canvas id="petChart"></canvas>
+    </section>
+</main>
+
+    <footer>
+        <p>&copy; 2023 PetClinic. All rights reserved.</p>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        window.onload = function() {
+            // Check if the URL contains a message query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            
+            if (message) {
+                // Show notification with the message
+                showNotification(message);
+            }
+        };
+
+        // Function to display the notification
+        function showNotification(message) {
+            var notification = document.createElement("div");
+            notification.id = "notification";
+            
+            // Check if the message is an error or success and set the notification class accordingly
+            if (message.includes("Failed")) {
+                notification.classList.add("error");
+            }
+
+            notification.textContent = message;
+
+            // Append the notification to the body and display it
+            document.body.appendChild(notification);
+
+            // Make the notification visible
+            setTimeout(function() {
+                notification.style.display = "block";
+            }, 10);
+
+            // Hide the notification after 5 seconds
+            setTimeout(function() {
+                notification.style.display = "none";
+                notification.remove();
+            }, 5000);
+        }
+    </script>
+    <script>
+    // Example Chart.js setup for Pet Data Overview
+    const ctx = document.getElementById('petChart').getContext('2d');
+    const petChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Dogs', 'Cats'],
+            datasets: [{
+                label: 'Number of Pets',
+                data: [10, 15], // Example data, replace with dynamic data
+                backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+                borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+    <script>
+        // dashboard.js
+const totalAppointments = document.getElementById('total-appointments');
+const totalPets = document.getElementById('total-pets');
+const totalClients = document.getElementById('total-clients');
+
+const appointmentsChartCtx = document.getElementById('appointmentsChart').getContext('2d');
+const petTypesChartCtx = document.getElementById('petTypesChart').getContext('2d');
+
+fetch('/PetClinicDashboardServlet')
+    .then(response => response.json())
+    .then(data => {
+        totalAppointments.textContent = data.totalAppointments;
+        totalPets.textContent = data.totalPets;
+        totalClients.textContent = data.totalClients;
+
+        new Chart(appointmentsChartCtx, {
+            type: 'line',
+            data: {
+                labels: data.appointmentsByMonth.labels,
+                datasets: [{
+                    label: 'Appointments',
+                    data: data.appointmentsByMonth.values,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            }
+        });
+
+        new Chart(petTypesChartCtx, {
+            type: 'doughnut',
+            data: {
+                labels: data.petTypes.labels,
+                datasets: [{
+                    label: 'Pet Types',
+                    data: data.petTypes.values,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+                }]
+            }
+        });
+    })
+    .catch(error => console.error('Error fetching dashboard data:', error));
+    </script>
+</body>
+</html>
